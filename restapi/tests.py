@@ -1,3 +1,11 @@
-from django.test import TestCase
+# from django.test import TestCase
+from unittest import TestCase
 
-# Create your tests here.
+
+def sum_ints(a, b):
+    return a + b
+
+
+class MySuite(TestCase):
+    def test_sum(self):
+        self.assertEqual(sum_ints(1, 2), 3)
