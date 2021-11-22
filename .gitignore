@@ -1,3 +1,4 @@
 django_crash_course
 .idea
 *__pycache__*
+*.sqlite3
