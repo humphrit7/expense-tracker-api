@@ -3,7 +3,7 @@ from unittest import TestCase
 
 
 def sum_ints(a, b):
-    return a + b
+    return 0
 
 
 class MySuite(TestCase):
