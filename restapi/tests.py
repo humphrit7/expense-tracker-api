@@ -69,3 +69,28 @@ class TestViews(TestCase):
             reverse("restapi:expense-list-create"), payload, format="json"
         )
         self.assertEqual(result.status_code, 400)
+
+    def test_expense_retrieve(self):
+        expense = models.Expense.objects.create(
+            amount=300.0, merchant="George", description="loan", category="transfer"
+        )
+        result = self.client.get(
+            reverse("restapi:expense-retrieve-delete", args=[expense.id]), format="json"
+        )
+        self.assertEqual(200, result.status_code)
+        json_result = result.json()
+        self.assertEqual(300.0, json_result["amount"])
+        self.assertEqual("George", json_result["merchant"])
+        self.assertEqual("loan", json_result["description"])
+        self.assertEqual("transfer", json_result["category"])
+        self.assertEqual(expense.id, json_result["id"])
+
+    def test_expense_delete(self):
+        expense = models.Expense.objects.create(
+            amount=400.0, merchant="John", description="loan", category="transfer"
+        )
+        result = self.client.delete(
+            reverse("restapi:expense-retrieve-delete", args=[expense.id]), format="json"
+        )
+        self.assertEqual(204, result.status_code)
+        self.assertFalse(models.Expense.objects.filter(pk=expense.id).exists())

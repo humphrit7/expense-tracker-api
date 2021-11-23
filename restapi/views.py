@@ -1,17 +1,12 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.generics import RetrieveDestroyAPIView, ListCreateAPIView
 from restapi import models, serializers
 
 
-class ExpenseListCreate(APIView):
-    def get(self, request):
-        expenses = models.Expense.objects.all()
-        serializer = serializers.Expense(expenses, many=True)
-        return Response(serializer.data, status=200)
+class ExpenseListCreate(ListCreateAPIView):
+    serializer_class = serializers.Expense
+    queryset = models.Expense.objects.all()
 
-    def post(self, request):
-        serializer = serializers.Expense(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=201)
+
+class ExpenseRetrieveDelete(RetrieveDestroyAPIView):
+    serializer_class = serializers.Expense
+    queryset = models.Expense.objects.all()
