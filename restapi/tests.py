@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.test import TestCase
 from django.utils import timezone
+from django.urls import reverse
 
 from restapi import models
 
@@ -29,3 +30,31 @@ class TestModels(TestCase):
         self.assertEqual(
             datetime.now(tz=timezone.utc).minute, inserted_expense.date_updated.minute
         )
+
+
+class TestViews(TestCase):
+    def test_expense_create(self):
+        payload = {
+            "amount": 50.0,
+            "merchant": "AT&T",
+            "description": "phone subscription",
+            "category": "utilities",
+        }
+        result = self.client.post(
+            reverse("restapi:expense-list-create"), payload, format="json"
+        )
+        self.assertEqual(201, result.status_code)
+        json_result = result.json()
+        self.assertEqual(float(json_result["amount"]), payload["amount"])
+        self.assertEqual(json_result["merchant"], payload["merchant"])
+        self.assertEqual(json_result["description"], payload["description"])
+        self.assertEqual(json_result["category"], payload["category"])
+        self.assertIsInstance(json_result["id"], int)
+
+    def test_expense_list(self):
+        result = self.client.get(reverse("restapi:expense-list-create"), format="json")
+        self.assertEqual(result.status_code, 200)
+        json_result = result.json()
+        self.assertIsInstance(json_result, list)
+        expenses = models.Expense.objects.all()
+        self.assertEqual(len(expenses), len(json_result))
