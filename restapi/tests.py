@@ -94,3 +94,20 @@ class TestViews(TestCase):
         )
         self.assertEqual(204, result.status_code)
         self.assertFalse(models.Expense.objects.filter(pk=expense.id).exists())
+
+    def test_list_expense_filter_by_merchant(self):
+        expense_john = models.Expense.objects.create(
+            amount=400.0, merchant="John", description="loan", category="transfer"
+        )
+        expense_george = models.Expense.objects.create(
+            amount=300.0, merchant="George", description="gift", category="card"
+        )
+        url = "/api/expenses?merchant=John"
+        result = self.client.get(url, format="json")
+        self.assertEqual(200, result.status_code)
+        json_result = result.json()
+        self.assertEqual(1, len(json_result))
+        self.assertEqual(json_result[0]["amount"], expense_john.amount)
+        self.assertEqual(json_result[0]["merchant"], expense_john.merchant)
+        self.assertEqual(json_result[0]["description"], expense_john.description)
+        self.assertEqual(json_result[0]["category"], expense_john.category)
