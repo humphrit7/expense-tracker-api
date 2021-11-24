@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.utils import timezone
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 from restapi import models
 
@@ -33,6 +34,13 @@ class TestModels(TestCase):
 
 
 class TestViews(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="test1234", email="test@eg.com")
+        self.user.set_password("test1234")
+        self.user.save()
+        self.client.login(username=self.user.username, password="test1234")
+
     def test_expense_create(self):
         payload = {
             "amount": 50.0,
